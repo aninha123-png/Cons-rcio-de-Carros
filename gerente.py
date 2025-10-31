@@ -3,23 +3,20 @@ from carro import Carro
 import json
 
 class Gerente(Funcionario):
-    def __init__(self, nome: str, idade: int, salario: float, cpf: str, cargo: str = "Gerente"):
-        super().__init__(nome, idade, salario, cpf, cargo)
+    def __init__(self, nome: str, idade: int, salario: float, cpf: str, senha: str, cargo: str = "Gerente"):
+        super().__init__(nome, idade, salario, cpf, senha, cargo)
 
     @staticmethod
     def verificar_gerente(cpf: str):
-        # Verifica se existe um gerente (cargo == 'Gerente') com o CPF; retorna instância ou None.
         funcionarios = Funcionario.listar_funcionarios()
         for f in funcionarios:
             if f.get("cpf") == cpf and f.get("cargo", "").lower() == "gerente":
-                return Gerente(f["nome"], f["idade"], f["salario"], f["cpf"], f.get("cargo", "Gerente"))
+                return Gerente(f["nome"], f["idade"], f["salario"], f["cpf"], f["senha"], f.get("cargo", "Gerente"))
         return None
 
     @staticmethod
-    def cadastrar_gerente():
-        # Cadastra o gerente. Apenas permite um gerente no sistema (requisito).
+    def cadastrar_gerente(cpf: str):
         funcionarios = Funcionario.listar_funcionarios()
-        # Verifica se já existe gerente
         for f in funcionarios:
             if f.get("cargo", "").lower() == "gerente":
                 print("Já existe um gerente cadastrado. Não é permitido cadastrar outro.")
@@ -28,34 +25,36 @@ class Gerente(Funcionario):
         nome = input("Digite seu nome: ").strip()
         idade = int(input("Digite sua idade: ").strip())
         salario = float(input("Digite seu salário: ").strip())
-        cpf = input("Digite seu CPF: ").strip()
+        senha = input("Digite sua senha: ").strip()
 
-        # Verificar CPF já existe entre funcionários
         for f in funcionarios:
             if f.get("cpf") == cpf:
                 print("CPF já cadastrado como funcionário/gerente.")
                 return None
 
-        novo = {"nome": nome, "idade": idade, "salario": salario, "cpf": cpf, "cargo": "Gerente"}
+        novo = {
+            "nome": nome, 
+            "idade": idade, 
+            "salario": salario, 
+            "cpf": cpf, 
+            "senha": senha,
+            "cargo": "Gerente"
+        }
         funcionarios.append(novo)
         
-        # Gravando as informações no arquivo JSON
         with open("funcionarios.json", "w", encoding="utf-8") as fh:
             json.dump(funcionarios, fh, indent=4, ensure_ascii=False)
 
         print(f"Gerente {nome} cadastrado com sucesso!")
-        return Gerente(nome, idade, salario, cpf, "Gerente")
+        return Gerente(nome, idade, salario, cpf, senha, "Gerente")
 
-    # Métodos exclusivos do gerente (usa Carro e Funcionario)
     def adicionar_carro(self):
-        # Solicita dados e adiciona um carro via Carro.adicionar_carro.
         modelo = input("Digite o modelo do carro: ").strip()
         ano = int(input("Digite o ano do carro: ").strip())
         preco = float(input("Digite o preço do carro: ").strip())
         Carro.adicionar_carro(modelo, ano, preco)
 
     def ver_historico_funcionarios(self):
-        # Exibe todos os funcionários cadastrados.
         funcionarios = Funcionario.listar_funcionarios()
         if not funcionarios:
             print("Nenhum funcionário cadastrado.")
@@ -66,7 +65,6 @@ class Gerente(Funcionario):
         print("-" * 40)
 
     def ver_historico_carros_vendidos(self):
-        # Exibe o histórico de carros vendidos.
         vendidos = Carro.listar_carros_vendidos()
         if not vendidos:
             print("Nenhum carro vendido ainda.")
@@ -79,7 +77,6 @@ class Gerente(Funcionario):
         print("-" * 40)
 
     def ver_carros_alugados(self):
-        # Exibe o histórico de carros alugados por funcionários.
         alugados = Carro.listar_carros_alugados()  # Agora pegamos o histórico de carros alugados
         if not alugados:
             print("Nenhum carro alugado ainda.")

@@ -3,7 +3,7 @@ import os
 
 CARROS_FILE = "carros.json"
 CARROS_VENDIDOS_FILE = "carros_vendidos.json"
-CARROS_ALUGADOS_FILE = "carros_alugados.json"  # Arquivo para armazenar carros alugados
+CARROS_ALUGADOS_FILE = "carros_alugados.json" 
 
 class Carro:
     def __init__(self, modelo, ano, preco):
@@ -13,7 +13,6 @@ class Carro:
 
     @staticmethod
     def _read_json(path):
-        # Lê o conteúdo do arquivo JSON e retorna os dados, ou uma lista vazia se houver erro.
         if os.path.exists(path):
             with open(path, "r", encoding="utf-8") as f:
                 return json.load(f)
@@ -21,18 +20,15 @@ class Carro:
 
     @staticmethod
     def _write_json(path, data):
-        # Escreve os dados no arquivo JSON, criando ou substituindo o conteúdo.
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
 
     @staticmethod
     def listar_carros():
-        # Retorna a lista de carros disponíveis (lista de dicionários).
         return Carro._read_json(CARROS_FILE)
 
     @staticmethod
     def adicionar_carro(modelo, ano, preco):
-        # Adiciona um carro ao estoque (carros.json).
         carros = Carro.listar_carros()
         carros.append({"modelo": modelo, "ano": ano, "preco": preco, "status": "disponível", "comprador_nome": None, "comprador_cpf": None})
         Carro._write_json(CARROS_FILE, carros)
@@ -40,17 +36,14 @@ class Carro:
 
     @staticmethod
     def listar_carros_vendidos():
-        # Retorna o histórico de carros vendidos.
         return Carro._read_json(CARROS_VENDIDOS_FILE)
 
     @staticmethod
     def listar_carros_alugados():
-        # Retorna o histórico de carros alugados.
         return Carro._read_json(CARROS_ALUGADOS_FILE)
 
     @staticmethod
     def vender_carro(modelo, comprador_nome=None, comprador_cpf=None):
-        # Vende um carro: remove do estoque e registra em carros_vendidos.json.
         carros = Carro.listar_carros()
         alvo = None
         for c in carros:
@@ -61,11 +54,9 @@ class Carro:
         if not alvo:
             return False
 
-        # Remove do estoque
         carros.remove(alvo)
         Carro._write_json(CARROS_FILE, carros)
 
-        # Registra a venda no histórico
         vendidos = Carro.listar_carros_vendidos()
         vendidos.append({
             "modelo": alvo["modelo"],
@@ -80,8 +71,6 @@ class Carro:
     @staticmethod
     def alugar_carro(modelo, comprador_nome=None, comprador_cpf=None):
 
-        # Aluga um carro: muda o status do carro para 'alugado' e registra os dados no histórico de aluguel.
-
         carros = Carro.listar_carros()
         alvo = None
         for c in carros:
@@ -90,15 +79,13 @@ class Carro:
                 break
 
         if not alvo:
-            return False  # Se não encontrar o carro ou ele não estiver disponível
+            return False  
 
-        # Altera o status do carro para 'alugado'
         alvo["status"] = "alugado"
         alvo["comprador_nome"] = comprador_nome
         alvo["comprador_cpf"] = comprador_cpf
         Carro._write_json(CARROS_FILE, carros)
 
-        # Registra o carro alugado no histórico
         alugados = Carro.listar_carros_alugados()
         alugados.append({
             "modelo": alvo["modelo"],
